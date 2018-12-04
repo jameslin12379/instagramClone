@@ -1,22 +1,52 @@
-var express = require('express');
-var router = express.Router();
+let express = require('express');
+let router = express.Router();
+const { body,validationResult } = require('express-validator/check');
+const { sanitizeBody } = require('express-validator/filter');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
+    res.render('index');
 });
+
+
 
 /// USER ROUTES ///
 
 // GET request for creating a User. NOTE This must come before routes that display User (uses id).
 router.get('/users/new', function(req, res){
-  res.send('hey there');
+  res.render('users/new');
+});
+
+// POST request for creating User.
+router.post('/users', function(req, res){
+    const email = req.body.email;
+    const username = req.body.username;
+    const password = req.body.password;
+
+    // validation
+    body('email', 'Empty email').isEmpty();
+    body('username', 'Empty username').isEmpty();
+    body('password', 'Empty password').isEmpty();
+    body('email', 'Invalid email').isEmail();
+    body('email', 'Email must be between 5-100 characters.').isLength({min:5, max:100});
+    body('username', 'Username must be between 5-20 characters.').isLength({min:5, max:20});
+    body('password', 'Password must be between 5-100 characters.').isLength({min:5, max:100});
+
+
+
+    let query = 'select * from user';
+    connection.query(query, function (error, results, fields) {
+        if (error) {
+            throw error;
+        }
+        res.send(results);
+        // error will be an Error if one occurred during the query
+        // results will contain the results of the query
+        // fields will contain information about the returned results fields (if any)
+    });
 });
 
 /*
-// POST request for creating User.
-router.post('/users', user_controller.user_create_post);
-
 // GET request to delete Book.
 router.get('/book/:id/delete', user_controller.book_delete_get);
 

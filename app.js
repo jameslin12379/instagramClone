@@ -1,37 +1,57 @@
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+let createError = require('http-errors');
+let express = require('express');
+let path = require('path');
+let cookieParser = require('cookie-parser');
+let logger = require('morgan');
+let bodyParser = require('body-parser')
+let indexRouter = require('./routes/index');
+//let usersRouter = require('./routes/users');
+let mysql      = require('mysql');
 
-var indexRouter = require('./routes/index');
-//var usersRouter = require('./routes/users');
+let app = express();
 
-var app = express();
 //Set up mongoose connection
-var mongoose = require('mongoose');
-var mongoDB = 'mongodb+srv://mg34:Pudong67@cluster0-icylf.mongodb.net/test?retryWrites=true';
-mongoose.connect(mongoDB);
-mongoose.Promise = global.Promise;
-var db = mongoose.connection;
-db.on('error', console.error.bind(console, 'MongoDB connection error:'));
+// let mongoose = require('mongoose');
+// let mongoDB = 'mongodb+srv://mg34:Pudong67@cluster0-icylf.mongodb.net/test?retryWrites=true';
+// mongoose.connect(mongoDB);
+// mongoose.Promise = global.Promise;
+// let db = mongoose.connection;
+// db.on('error', console.error.bind(console, 'MongoDB connection error:'));
+// let User = require('./models/user');
 
-var User = require('./models/user');
+let connection = mysql.createConnection({
+    host     : 'localhost',
+    user     : 'root',
+    password : 'Pudong67',
+    database : 'instagramClone'
+});
+
+connection.connect(function(err) {
+    if (err) {
+        console.error('error connecting: ' + err.stack);
+        return;
+    }
+
+    console.log('connected as id ' + connection.threadId);
+});
+global.connection = connection;
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'pug');
+app.set('view engine', 'ejs');
 
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(bodyParser.json()); // support json encoded bodies
+app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 
 app.use('/', indexRouter);
-app.use('/users', indexRouter);
-app.use('/comments', indexRouter);
-app.use('/photos', indexRouter);
+// app.use('/users', indexRouter);
+// app.use('/comments', indexRouter);
+// app.use('/photos', indexRouter);
 //app.use('/users', usersRouter);
 
 // catch 404 and forward to error handler
