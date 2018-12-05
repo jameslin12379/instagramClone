@@ -1,15 +1,23 @@
 <% include ../partials/header %>
 
 <div class="container">
+    <% if (errors) { %>
+        <% for(var i = 0; i < errors.length; i++) { %>
+            <div class="alert alert-warning" role="alert">
+                <%= errors[i].msg %>
+            </div>
+        <% } %>
+    <% } %>
+
     <form action="/users" method="post">
         <div class="form-group">
-            <input type="email" name="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Email" required>
+            <input type="email" name="email" class="form-control" aria-describedby="emailHelp" placeholder="Email" value="<% if (email) { %> email <% } %>" required>
         </div>
         <div class="form-group">
-            <input type="text" name="username" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Username" required>
+            <input type="text" name="username" class="form-control" aria-describedby="emailHelp" placeholder="Username" value="<% if (username) { %> username <% } %>" required>
         </div>
         <div class="form-group">
-            <input type="password" name="password" class="form-control" id="exampleInputPassword1" placeholder="Password" required>
+            <input type="password" name="password" class="form-control" placeholder="Password" required>
         </div>
         <button type="submit" class="btn btn-primary">Sign up</button>
     </form>
